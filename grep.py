@@ -2,12 +2,11 @@ import argparse
 import re
 import os
 import glob
-from pathlib import Path
-file_list = []
 
 
 def ignore_case(filename, word, path):
-    pattern = re.compile(r"{}.*".format(word), re.IGNORECASE)
+    """Search a word"""
+    pattern = re.compile(r'{}.*'.format(word), re.I)
     os.chdir(path)
     f_path = glob.glob(filename)
 
@@ -18,7 +17,8 @@ def ignore_case(filename, word, path):
             matches = pattern.finditer(contents)
 
             for match in matches:
-                print("{} \t {}".format(file, match.group(0)))
+                found = "{} \t {}".format(file, match.group(0))
+                print(found)
 
 
 def grep(filename, word, path):
@@ -34,26 +34,25 @@ def grep(filename, word, path):
             matches = pattern.finditer(contents)
 
             for match in matches:
-                print("{} \t {}".format(file, match.group(0)))
+                found = "{} \t {}".format(file, match.group(0))
+                print(found)
 
 
 def main():
     """Argument Parser"""
     parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument("-ig", "--ignore", help="Ignore case sensitive.", action="store_true")
-    parser.add_argument("word", type=str)
-    parser.add_argument("filename", type=str)
-    parser.add_argument("path", type=Path)
+    parser.add_argument("word", help="Type a word to search", type=str)
+    parser.add_argument("filename", help="File type/filename", type=str)
+    parser.add_argument("path", nargs='?', help="path", type=str)
+    parser.add_argument("-i", "--ignore", help="Ignores case sensitive.", action="store_true")
     args = parser.parse_args()
 
     """Function arguments"""
-    if args.filename and args.word and args.path:
-        grep(args.filename, args.word, args.path)
-    elif args.ignore:
+
+    if args.ignore:
         ignore_case(args.filename, args.word, args.path)
     else:
-        print("Error.")
+        grep(args.filename, args.word, args.path)
 
 
 if __name__ == "__main__":
